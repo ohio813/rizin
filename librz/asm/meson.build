@@ -306,18 +306,20 @@ rz_asm_inc = [
   )
 ]
 
+rz_asm_deps = [
+  rz_util_dep,
+  rz_config_dep,
+  rz_syscall_dep,
+  rz_flag_dep,
+  rz_parse_dep,
+  rz_bin_dep,
+  capstone_dep,
+  dependency('rzspp'),
+]
+
 rz_asm = library('rz_asm', rz_asm_sources,
   include_directories: rz_asm_inc,
-  dependencies: [
-    rz_util_dep,
-    rz_config_dep,
-    rz_syscall_dep,
-    rz_flag_dep,
-    rz_parse_dep,
-    rz_bin_dep,
-    capstone_dep,
-    dependency('rzspp'),
-  ],
+  dependencies: rz_asm_deps,
   install: true,
   implicit_include_directories: false,
   install_rpath: rpath_lib,
@@ -333,7 +335,7 @@ meson.override_dependency('rz_asm', rz_asm_dep)
 
 modules += { 'rz_asm': {
     'target': rz_asm,
-    'dependencies': ['rz_util', 'rz_config', 'rz_syscall', 'rz_flag', 'rz_parse', 'rz_bin'],
+    'dependencies': rz_asm_deps,
     'plugins': [asm_plugins]
 }}
 

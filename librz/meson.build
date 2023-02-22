@@ -47,12 +47,22 @@ foreach module_name, module : modules
   endif
   pkgconfig_vars += ['datdir=@0@'.format(rizin_datdir_rz)]
 
+  dependencies = []
+  foreach dep : module['dependencies']
+    if dep.type_name() != 'internal' and dep.type_name() != 'library'
+      dependencies += [dep.name()]
+    elif dep.type_name() == 'internal'
+      if dep.get_variable(pkgconfig: 'Name', default_value: '') != ''
+        dependencies += [dep.get_variable(pkgconfig: 'Name')]
+      endif
+    endif
+  endforeach
+
   pkgconfig_mod.generate(module['target'],
     subdirs: include_subdirs,
     version: rizin_version,
     name: module_name,
     filebase: module_name,
-    requires: module['dependencies'],
     description: 'rizin foundation libraries',
     variables: pkgconfig_vars,
   )
@@ -62,7 +72,7 @@ foreach module_name, module : modules
     conf = configuration_data()
     conf.set('RZ_VERSION', rizin_version)
     conf.set('RIZIN_MODULE', module['target'].name())
-    conf.set('RIZIN_MODULE_DEPS', ' '.join(module['dependencies']))
+    conf.set('RIZIN_MODULE_DEPS', ' '.join(dependencies))
     conf.set('PACKAGE_RELATIVE_PATH', cmake_package_relative_path)
     conf.set('INSTALL_INCDIR', rizin_incdir)
     conf.set('INSTALL_LIBDIR', rizin_libdir)

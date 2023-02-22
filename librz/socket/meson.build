@@ -10,22 +10,21 @@ rz_socket_sources = [
   'run.c',
 ]
 
-dependencies = [utl, rz_util_dep, platform_deps]
-rz_socket_deps = []
+rz_socket_deps = [utl, rz_util_dep] + platform_deps
 
 if sys_openssl.found()
-  dependencies += [sys_openssl]
+  rz_socket_deps += [sys_openssl]
 endif
 
 if host_machine.system() == 'haiku'
-  dependencies += [
+  rz_socket_deps += [
     cc.find_library('network')
   ]
 endif
 
 rz_socket = library('rz_socket', rz_socket_sources,
   include_directories: [platform_inc],
-  dependencies: dependencies,
+  dependencies: rz_socket_deps,
   install: true,
   implicit_include_directories: false,
   install_rpath: rpath_lib,
@@ -42,5 +41,5 @@ meson.override_dependency('rz_socket', rz_socket_dep)
 
 modules += { 'rz_socket': {
     'target': rz_socket,
-    'dependencies': ['rz_util']
+    'dependencies': rz_socket_deps,
 }}

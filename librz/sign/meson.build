@@ -38,13 +38,5 @@ meson.override_dependency('rz_sign', rz_sign_dep)
 
 modules += { 'rz_sign': {
     'target': rz_sign,
-    'dependencies': [
-      'rz_util',
-      'rz_analysis',
-      'rz_diff',
-      'rz_hash',
-      'rz_type',
-      'rz_search',
-      'rz_flag',
-    ]
+    'dependencies': rz_sign_deps,
 }}

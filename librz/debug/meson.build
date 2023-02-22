@@ -72,8 +72,8 @@ rz_debug_deps = [
   rz_egg_dep,
   rz_analysis_dep,
   rz_type_dep,
-  platform_deps
 ]
+rz_debug_deps += platform_deps
 
 if get_option('use_gpl')
   rz_debug_deps += dependency('rzqnx')
@@ -152,18 +152,6 @@ meson.override_dependency('rz_debug', rz_debug_dep)
 
 modules += { 'rz_debug': {
     'target': rz_debug,
-    'dependencies': [
-      'rz_util',
-      'rz_hash',
-      'rz_reg',
-      'rz_syscall',
-      'rz_analysis',
-      'rz_io',
-      'rz_bin',
-      'rz_bp',
-      'rz_cons',
-      'rz_egg',
-      'rz_type'
-    ],
+    'dependencies': rz_debug_deps,
     'plugins': [debug_plugins]
 }}

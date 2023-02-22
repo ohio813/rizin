@@ -46,9 +46,10 @@ rz_crypto_sources = [
 nettle_proj = subproject('nettle')
 aes_dep = nettle_proj.get_variable('aes_dep')
 
+rz_crypto_deps = [rz_util_dep, aes_dep]
 rz_crypto = library('rz_crypto', rz_crypto_sources,
   include_directories: [platform_inc],
-  dependencies: [rz_util_dep, aes_dep],
+  dependencies: rz_crypto_deps,
   install: true,
   implicit_include_directories: false,
   install_rpath: rpath_lib,
@@ -64,6 +65,6 @@ meson.override_dependency('rz_crypto', rz_crypto_dep)
 
 modules += { 'rz_crypto': {
     'target': rz_crypto,
-    'dependencies': ['rz_util'],
+    'dependencies': rz_crypto_deps,
     'plugins': [crypto_plugins]
 }}

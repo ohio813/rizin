@@ -137,6 +137,6 @@ meson.override_dependency('rz_hash', rz_hash_dep)
 
 modules += { 'rz_hash': {
     'target': rz_hash,
-    'dependencies': ['rz_util'],
+    'dependencies': dependencies,
     'plugins': [hash_plugins]
 }}

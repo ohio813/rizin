@@ -23,11 +23,11 @@ rz_demangler_sources = [
   'demangler.c'
 ]
 
-dependencies = [rz_util_dep, libdemangle_dep]
+rz_demangler_deps = [rz_util_dep, libdemangle_dep]
 
 rz_demangler = library('rz_demangler', rz_demangler_sources,
   include_directories: [platform_inc],
-  dependencies: dependencies,
+  dependencies: rz_demangler_deps,
   install: true,
   implicit_include_directories: false,
   install_rpath: rpath_lib,
@@ -42,6 +42,6 @@ meson.override_dependency('rz_demangler', rz_demangler_dep)
 
 modules += { 'rz_demangler': {
     'target': rz_demangler,
-    'dependencies': ['rz_util'],
+    'dependencies': rz_demangler_deps,
     'plugins': [demangler_plugins]
 }}

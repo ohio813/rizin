@@ -5,11 +5,10 @@ rz_flag_sources = [
   'serialize_flag.c'
 ]
 
+rz_flag_deps = [rz_util_dep]
 rz_flag = library('rz_flag', rz_flag_sources,
   include_directories: [platform_inc],
-  dependencies: [
-    rz_util_dep
-  ],
+  dependencies: rz_flag_deps,
   install: true,
   implicit_include_directories: false,
   install_rpath: rpath_lib,
@@ -25,7 +24,7 @@ meson.override_dependency('rz_flag', rz_flag_dep)
 
 modules += { 'rz_flag': {
     'target': rz_flag,
-    'dependencies': ['rz_util']
+    'dependencies': rz_flag_deps,
 }}
 
 subdir('d')

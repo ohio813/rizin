@@ -58,12 +58,5 @@ meson.override_dependency('rz_main', rz_main_dep)
 
 modules += { 'rz_main': {
     'target': rz_main,
-    'dependencies': [
-      'rz_core',
-      'rz_demangler',
-      'rz_asm',
-      'rz_sign',
-      'rz_diff',
-      'rz_syscall'
-    ]
+    'dependencies': rz_main_deps,
 }}

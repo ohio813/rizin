@@ -37,7 +37,7 @@ meson.override_dependency('rz_magic', rz_magic_dep)
 
 modules += { 'rz_magic': {
     'target': rz_magic,
-    'dependencies': ['rz_util']
+    'dependencies': rz_magic_deps,
 }}
 
 subdir('d')
