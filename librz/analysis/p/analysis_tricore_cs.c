@@ -10,6 +10,7 @@
 #include <capstone/tricore.h>
 
 #include "../../asm/arch/tricore/tricore.inc"
+#include "../arch/tricore/tricore_il.inc"
 
 #define TRICORE_REG_SP TRICORE_REG_A10
 
@@ -83,8 +84,6 @@ static void tricore_opex(RzStrBuf *ptr, csh handle, cs_insn *p_insn);
 
 static void rz_analysis_tricore_fillval(RzAnalysis *, RzAnalysisOp *, csh, cs_insn *);
 
-static RzAnalysisLiftedILOp rz_analysis_tricore_il_op();
-
 static void tricore_op_set_type(RzAnalysisOp *op, csh h, cs_insn *insn);
 
 static int
@@ -138,7 +137,7 @@ rz_analysis_tricore_op(RzAnalysis *a, RzAnalysisOp *op, ut64 addr, const ut8 *da
 		rz_analysis_tricore_fillval(a, op, handle, insn);
 	}
 	if (mask & RZ_ANALYSIS_OP_MASK_IL) {
-		op->il_op = rz_analysis_tricore_il_op();
+		op->il_op = rz_analysis_tricore_il_op(a, insn, handle, mode);
 	}
 
 	cs_free(insn, count);
@@ -984,10 +983,6 @@ static void tricore_op_set_type(RzAnalysisOp *op, csh h, cs_insn *insn) {
 	}
 }
 
-static RzAnalysisLiftedILOp rz_analysis_tricore_il_op() {
-	return NULL;
-}
-
 static inline void fill_from_tricore_op(RzReg *rz_reg, csh handle, RzAnalysisValue *av, cs_tricore_op *top) {
 	switch (top->type) {
 	case TRICORE_OP_INVALID:
@@ -1074,11 +1069,6 @@ static void tricore_opex(RzStrBuf *ptr, csh handle, cs_insn *p_insn) {
 	pj_free(pj);
 }
 
-static RzAnalysisILConfig *il_config(RzAnalysis *analysis) {
-	RzAnalysisILConfig *cfg = rz_analysis_il_config_new(32, false, 32);
-	return cfg;
-}
-
 static int archinfo(RzAnalysis *a, RzAnalysisInfoType query) {
 	switch (query) {
 	case RZ_ANALYSIS_ARCHINFO_MIN_OP_SIZE:
@@ -1103,7 +1093,7 @@ RzAnalysisPlugin rz_analysis_plugin_tricore_cs = {
 	.get_reg_profile = get_reg_profile,
 	.archinfo = archinfo,
 	.op = rz_analysis_tricore_op,
-	.il_config = il_config,
+	.il_config = tricore_il_config,
 };
 
 #ifndef RZ_PLUGIN_INCORE
