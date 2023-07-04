@@ -506,6 +506,9 @@ RZ_IPI RzBinDwarfBlock *RzBinDwarfBlock_clone(RzBinDwarfBlock *self) {
 		return NULL;
 	}
 	*clone = *self;
+	if (self->data == NULL) {
+		return clone;
+	}
 	clone->data = RZ_NEWS0(ut8, self->length);
 	if (!clone->data) {
 		free(clone);
