@@ -123,7 +123,7 @@ void RzBinDwarfLocationListEntry_free(RzBinDwarfLocationListEntry *self) {
 }
 
 static bool convert_raw(RzBinDwarfLocListTable *self, RzBinDwarfRawLocListEntry *raw, RzBinDwarfLocationListEntry **out) {
-	ut64 mask = !0 >> (64 - self->encoding.address_size * 8);
+	ut64 mask = ~0ULL >> (64 - self->encoding.address_size * 8);
 	ut64 tombstone = self->encoding.version <= 4 ? mask - 1
 						     : mask;
 	RzBinDwarfRange *range = NULL;
