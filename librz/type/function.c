@@ -135,7 +135,6 @@ RZ_API RZ_OWN RzCallable *rz_type_func_new(RzTypeDB *typedb, RZ_NONNULL const ch
 		return NULL;
 	}
 	callable->ret = type;
-	callable->noret = type == NULL;
 	return callable;
 }
 
@@ -152,6 +151,17 @@ RZ_API bool rz_type_func_save(RzTypeDB *typedb, RZ_NONNULL RzCallable *callable)
 	}
 	ht_pp_insert(typedb->callables, callable->name, callable);
 	return true;
+}
+
+/**
+ * \brief Update RzCallable type in the types database
+ *
+ * \param typedb Type Database instance
+ * \param callable RzCallable type to save
+ */
+RZ_API bool rz_type_func_update(RzTypeDB *typedb, RZ_NONNULL RzCallable *callable) {
+	rz_return_val_if_fail(typedb && callable && callable->name, false);
+	return ht_pp_update(typedb->callables, callable->name, callable);
 }
 
 /**

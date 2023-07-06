@@ -407,6 +407,7 @@ RZ_API bool rz_type_callable_arg_add(RZ_NONNULL RzCallable *callable, RZ_OWN RZ_
 
 RZ_API RZ_OWN RzCallable *rz_type_func_new(RzTypeDB *typedb, RZ_NONNULL const char *name, RZ_OWN RZ_NULLABLE RzType *type);
 RZ_API bool rz_type_func_save(RzTypeDB *typedb, RZ_NONNULL RzCallable *callable);
+RZ_API bool rz_type_func_update(RzTypeDB *typedb, RZ_NONNULL RzCallable *callable);
 RZ_API RZ_BORROW RzCallable *rz_type_func_get(RzTypeDB *typedb, RZ_NONNULL const char *func_name);
 RZ_API bool rz_type_func_delete(RzTypeDB *typedb, RZ_NONNULL const char *func_name);
 RZ_API void rz_type_func_delete_all(RzTypeDB *typedb);
