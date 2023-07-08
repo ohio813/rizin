@@ -198,7 +198,7 @@ RZ_API bool rz_type_db_save_base_type(const RzTypeDB *typedb, RzBaseType *type) 
 }
 
 /**
- * \brief Saves RzBaseType into the Types DB
+ * \brief Updates the base type in the Types DB, frees the old one, frees the new one if it fails
  *
  * \param typedb Type Database instance
  * \param type RzBaseType to save
