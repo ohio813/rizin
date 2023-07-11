@@ -90,7 +90,7 @@ static inline void *rz_vector_index_ptr(const RzVector *vec, size_t index) {
 }
 
 // returns a pointer to the first element of the vector
-static inline void *rz_vector_head(RzVector *vec) {
+static inline void *rz_vector_head(const RzVector *vec) {
 	rz_return_val_if_fail(vec, NULL);
 	return (void *)vec->a;
 }

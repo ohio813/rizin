@@ -998,8 +998,10 @@ static RzBinDwarfLocation *parse_dwarf_location(Context *ctx, const RzBinDwarfAt
 		}
 		if (rz_vector_len(&loclist->entries) >= 1) {
 			return parse_dwarf_location_list(ctx, loclist, fn);
-		} else if (rz_vector_len(&loclist->entries) == 1 && rz_vector_head(&loclist->entries)) {
-			block = rz_vector_head(&loclist->entries);
+		} else {
+			RzBinDwarfLocation *loc = RZ_NEW0(RzBinDwarfLocation);
+			loc->kind = RzBinDwarfLocationKind_EMPTY;
+			return loc;
 		}
 	} else if (attr->kind == DW_AT_KIND_BLOCK) {
 		block = &attr->block;
