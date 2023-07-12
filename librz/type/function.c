@@ -32,7 +32,7 @@ RZ_API RZ_OWN RzCallable *rz_type_callable_new(RZ_NULLABLE const char *name) {
  */
 RZ_API RZ_OWN RzCallable *rz_type_callable_clone(RZ_BORROW RZ_NONNULL const RzCallable *callable) {
 	rz_return_val_if_fail(callable, NULL);
-	RzCallable *newcallable = RZ_NEW0(RzCallable);
+	RzCallable *newcallable = RZ_NEWCOPY(RzCallable, callable);
 	if (!newcallable) {
 		return NULL;
 	}
@@ -466,6 +466,9 @@ static bool callable_as_string(RzStrBuf *buf, const RzTypeDB *typedb, RZ_NONNULL
 			first = false;
 			free(argstr);
 		}
+	}
+	if (callable->has_unspecified_parameters) {
+		rz_strbuf_append(buf, ", ...");
 	}
 	rz_strbuf_append(buf, ")");
 	return true;
