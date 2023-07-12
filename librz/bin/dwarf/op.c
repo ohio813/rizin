@@ -669,12 +669,14 @@ addrmask_from_size(uint8_t size) {
 }
 
 RZ_API RzBinDwarfEvaluation *rz_bin_dwarf_evaluation_new(RzBuffer *byte_code, RzBinDwarf *dw, RzBinDwarfCompUnit *unit, RzBinDwarfDie *die) {
+	rz_return_val_if_fail(byte_code && dw, NULL);
 	RzBinDwarfEvaluation *self = RZ_NEW0(RzBinDwarfEvaluation);
 	RET_NULL_IF_FAIL(self);
-	ut64 addr_mask = addrmask_from_size(unit->hdr.encoding.address_size);
+	RzBinDwarfEncoding *encoding = unit ? &unit->hdr.encoding : &dw->encoding;
+	ut64 addr_mask = addrmask_from_size(encoding->address_size);
 	self->addr_mask = addr_mask;
 	self->bytecode = byte_code;
-	self->encoding = &unit->hdr.encoding;
+	self->encoding = encoding;
 	self->pc = rz_buf_new_with_buf(byte_code);
 	self->dw = dw;
 	self->unit = unit;
@@ -687,6 +689,7 @@ RZ_API RzBinDwarfEvaluation *rz_bin_dwarf_evaluation_new(RzBuffer *byte_code, Rz
 }
 
 RZ_API RzBinDwarfEvaluation *rz_bin_dwarf_evaluation_new_from_block(const RzBinDwarfBlock *block, RzBinDwarf *dw, RzBinDwarfCompUnit *unit, RzBinDwarfDie *die) {
+	rz_return_val_if_fail(block && dw, NULL);
 	RzBuffer *expr = rz_buf_new_with_bytes(block->data, block->length);
 	RzBinDwarfEvaluation *self = rz_bin_dwarf_evaluation_new(expr, dw, unit, die);
 	RET_NULL_IF_FAIL(self);
@@ -1107,6 +1110,7 @@ bool Evaluation_end_of_expression(RzBinDwarfEvaluation *self) {
 }
 
 RZ_API bool rz_bin_dwarf_evaluation_evaluate(RzBinDwarfEvaluation *self, RzBinDwarfEvaluationResult *out) {
+	rz_return_val_if_fail(self && out, false);
 	if (self->state.kind == EVALUATION_STATE_START) {
 		if (self->state.start) {
 			Evaluation_push(self, self->state.start);
