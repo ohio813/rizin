@@ -1393,7 +1393,7 @@ static bool dw_var_to_rz_var(RzAnalysis *a, RzAnalysisFunction *f, RzAnalysisDwa
 	}
 	case RzBinDwarfLocationKind_ADDRESS: {
 		rz_analysis_var_global_create(a, dw_var->prefer_name, dw_var->type, loc->address);
-		variable_fini(dw_var);
+		rz_analysis_var_fini(var);
 		return false;
 	}
 	case RzBinDwarfLocationKind_VALUE:
@@ -1409,7 +1409,7 @@ static bool dw_var_to_rz_var(RzAnalysis *a, RzAnalysisFunction *f, RzAnalysisDwa
 		rz_analysis_var_storage_init_dwarf_eval_waiting(storage, loc->eval_waiting.eval, loc->eval_waiting.result);
 		break;
 	case RzBinDwarfLocationKind_CFA_OFFSET:
-		// // TODO: The following is only an educated guess. There is actually more involved in calculating the
+		// TODO: The following is only an educated guess. There is actually more involved in calculating the
 		//       CFA correctly.
 		rz_analysis_var_storage_init_stack(storage, loc->cfa_offset + a->bits / 8);
 		break;
