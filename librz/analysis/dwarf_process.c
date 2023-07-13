@@ -546,17 +546,19 @@ bool enum_children_parse(Context *ctx, const RzBinDwarfDie *die, RzBaseType *bas
 		RzTypeEnumCase cas = {};
 		RzTypeEnumCase *result = parse_enumerator(ctx, child_die, &cas);
 		if (!result) {
-			rz_pvector_free(children);
-			return false;
+			goto err;
 		}
 		void *element = rz_vector_push(&base_type->enum_data.cases, &cas);
 		if (!element) {
-			rz_pvector_free(children);
 			rz_type_base_enum_case_free(result, NULL);
+			goto err;
 		}
 	}
 	rz_pvector_free(children);
 	return true;
+err:
+	rz_pvector_free(children);
+	return false;
 }
 
 static void function_apply_specification(Context *ctx, const RzBinDwarfDie *die, RzAnalysisDwarfFunction *fn) {
