@@ -130,7 +130,9 @@ RZ_API RZ_OWN RzList /*<RzBaseType *>*/ *rz_type_db_get_base_types(const RzTypeD
  * \param type RzBaseType pointer
  */
 RZ_API void rz_type_base_type_free(RzBaseType *type) {
-	rz_return_if_fail(type);
+	if (!type) {
+		return;
+	}
 	RZ_FREE(type->name);
 	rz_type_free(type->type);
 	type->type = NULL;
