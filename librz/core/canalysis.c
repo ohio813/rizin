@@ -5103,10 +5103,42 @@ RZ_IPI char *rz_core_analysis_var_display(RzCore *core, RzAnalysisVar *var, bool
 	if (!fmt) {
 		return rz_strbuf_drain(sb);
 	}
+	bool usePxr = rz_type_is_strictly_atomic(core->analysis->typedb, var->type) && rz_type_atomic_str_eq(core->analysis->typedb, var->type, "int");
 	if (add_name) {
 		rz_strbuf_appendf(sb, "%s %s = ", rz_analysis_var_is_arg(var) ? "arg" : "var", var->name);
 	}
-	rz_analysis_var_storage_dump(sb, &var->storage);
+	switch (var->storage.type) {
+	case RZ_ANALYSIS_VAR_STORAGE_REG: {
+		char *r;
+		if (usePxr) {
+			// TODO: convert to API
+			r = rz_core_cmd_strf(core, "pxr $w @r:%s", var->storage.reg);
+		} else {
+			// TODO: convert to API
+			r = rz_core_cmd_strf(core, "pf r (%s)", var->storage.reg);
+		}
+		rz_strbuf_append(sb, r);
+		free(r);
+		break;
+	}
+	case RZ_ANALYSIS_VAR_STORAGE_STACK: {
+		ut64 addr = rz_analysis_var_addr(var);
+		char *r;
+		if (usePxr) {
+			// TODO: convert to API
+			r = rz_core_cmd_strf(core, "pxr $w @ 0x%" PFMT64x, addr);
+		} else {
+			// TODO: convert to API
+			r = rz_core_cmd_strf(core, "pf %s @ 0x%" PFMT64x, fmt, addr);
+		}
+		rz_strbuf_append(sb, r);
+		free(r);
+	} break;
+	default:
+		rz_strbuf_append(sb, "unimplemented\n");
+		break;
+	}
+	free(fmt);
 	return rz_strbuf_drain(sb);
 }
 
