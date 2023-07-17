@@ -1,5 +1,5 @@
 [wrap-git]
 url = https://github.com/rizinorg/tree-sitter-c
-revision = 51ecadb131b5712457b543db8d15ab141ae9f117
+revision = 121ee53311548415ec9de3eeb7515b5eb86b42e1
 patch_directory = tree-sitter-c
 directory = tree-sitter-c
