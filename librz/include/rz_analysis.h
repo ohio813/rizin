@@ -447,10 +447,10 @@ typedef struct rz_analysis_hint_cb_t {
 typedef struct rz_analysis_il_vm_t RzAnalysisILVM;
 
 typedef struct {
-	HtUP /*<RzAnalysisDwarfFunction *>*/ *function_by_addr;
-	SetP /*<const char*>*/ *function_names;
+	HtPP /*<RzAnalysisDwarfFunction *>*/ *function_by_name;
+	HtUP /*<const RzAnalysisDwarfFunction *>*/ *function_by_addr;
 	HtUP /*<RzType *>*/ *type_by_offset;
-	SetP /*<const char*>*/ *base_type_names;
+	SetP /*<const char *>*/ *base_type_names;
 } RzAnalysisDebugInfo;
 
 typedef struct rz_analysis_t {

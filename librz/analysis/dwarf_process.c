@@ -573,7 +573,7 @@ static RzType *type_parse_from_offset_internal(Context *ctx, ut64 offset,
 			goto end;
 		}
 		RzCallable *callable = NULL;
-		if (!set_p_contains(ctx->analysis->debug_info->function_names, name)) {
+		if (!ht_pp_find(ctx->analysis->debug_info->function_by_name, name, NULL)) {
 			if (!function_parse(ctx, die)) {
 				goto end;
 			}
@@ -1085,13 +1085,13 @@ static void function_free(RzAnalysisDwarfFunction *f) {
  *        save the information into the Sdb
  */
 static bool function_parse(Context *ctx, RzBinDwarfDie *die) {
-	RzAnalysisDwarfFunction *fcn = RZ_NEW0(RzAnalysisDwarfFunction);
-	if (!fcn) {
-		goto cleanup;
-	}
-	rz_vector_init(&fcn->variables, sizeof(RzAnalysisDwarfVariable), (RzVectorFree)variable_fini, NULL);
+	RzAnalysisDwarfFunction *fcn = NULL;
 	if (rz_bin_dwarf_die_get_attr(die, DW_AT_declaration)) {
 		goto cleanup; /* just declaration skip */
+	}
+	fcn = RZ_NEW0(RzAnalysisDwarfFunction);
+	if (!fcn) {
+		goto cleanup;
 	}
 	RzBinDwarfAttr *val;
 	rz_vector_foreach(&die->attrs, val) {
@@ -1152,22 +1152,32 @@ static bool function_parse(Context *ctx, RzBinDwarfDie *die) {
 		fcn->demangle_name = ctx->analysis->binb.demangle(ctx->analysis->binb.bin, rz_bin_dwarf_lang_for_demangle(ctx->unit->language), fcn->link_name);
 	}
 	fcn->prefer_name = function_name(fcn, ctx->unit->language);
-	if (!fcn->prefer_name || !fcn->addr) { /* we need a name, faddr */
+	if (!fcn->prefer_name) { /* we need a name, faddr */
 		goto cleanup;
+	}
+	if (ht_pp_find(ctx->analysis->debug_info->function_by_name, fcn->prefer_name, NULL)) {
+		function_free(fcn);
+		return true;
 	}
 
 	RzCallable *callable = rz_type_func_new(ctx->analysis->typedb, fcn->prefer_name, fcn->ret_type ? rz_type_clone(fcn->ret_type) : NULL);
+	rz_vector_init(&fcn->variables, sizeof(RzAnalysisDwarfVariable), (RzVectorFree)variable_fini, NULL);
 	function_children_parse(ctx, die, callable, fcn);
+
 	RZ_LOG_DEBUG("DWARF Saving function %s\n", fcn->prefer_name);
 	if (!rz_type_func_update(ctx->analysis->typedb, callable)) {
 		RZ_LOG_ERROR("DWARF Failed to save function %s\n", fcn->prefer_name);
 		goto cleanup;
 	}
-	if (!ht_up_update(ctx->analysis->debug_info->function_by_addr, fcn->addr, fcn)) {
+	if (!ht_pp_update(ctx->analysis->debug_info->function_by_name, fcn->prefer_name, fcn)) {
 		goto cleanup;
 	}
+	if (fcn->addr > 0) {
+		if (!ht_up_update(ctx->analysis->debug_info->function_by_addr, fcn->addr, fcn)) {
+			goto cleanup;
+		}
+	}
 
-	set_p_add(ctx->analysis->debug_info->function_names, fcn->prefer_name);
 	return true;
 cleanup:
 	function_free(fcn);
@@ -1373,7 +1383,7 @@ rz_analysis_dwarf_integrate_functions(RzAnalysis *analysis, RzFlag *flags) {
 	ht_up_foreach(analysis->debug_info->function_by_addr, dwarf_integrate_function, analysis);
 }
 
-static void htup_function_free(HtUPKv *kv) {
+static void htpp_function_free(HtPPKv *kv) {
 	if (!kv) {
 		return;
 	}
@@ -1385,8 +1395,8 @@ RZ_API RzAnalysisDebugInfo *rz_analysis_debug_info_new() {
 	if (!debug_info) {
 		return NULL;
 	}
-	debug_info->function_by_addr = ht_up_new(NULL, htup_function_free, NULL);
-	debug_info->function_names = set_p_new();
+	debug_info->function_by_name = ht_pp_new(NULL, htpp_function_free, NULL);
+	debug_info->function_by_addr = ht_up_new(NULL, NULL, NULL);
 	debug_info->type_by_offset = ht_up_new(NULL, htup_type_free, NULL);
 	debug_info->base_type_names = set_p_new();
 	return debug_info;
@@ -1396,8 +1406,8 @@ RZ_API void rz_analysis_debug_info_free(RzAnalysisDebugInfo *debuginfo) {
 	if (!debuginfo) {
 		return;
 	}
+	ht_pp_free(debuginfo->function_by_name);
 	ht_up_free(debuginfo->function_by_addr);
-	set_p_free(debuginfo->function_names);
 	ht_up_free(debuginfo->type_by_offset);
 	set_p_free(debuginfo->base_type_names);
 	free(debuginfo);
